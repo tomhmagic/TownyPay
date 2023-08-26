@@ -1,0 +1,93 @@
+name: TownyPay
+version: 1.0.0
+language: english
+author: Tomhmagic
+website: ''
+description: >
+  Language file for all game messages for this Locale.
+
+# A note on editing this file.
+# ----------------------------
+#
+# Do not alter this file if it is in the reference folder.
+# Before you edit this file, read about how Towny handles
+# language files:
+# https://github.com/TownyAdvanced/Towny/wiki/How-Towny-Works#multi-language.
+#
+#
+# A note on text formatting (how Towny inserts words.)
+# ----------------------------------------------------
+#
+# You MUST retain spacing in the texts.
+# If a text begins or ends with a space, it must remain that
+# way.
+#
+#      %s = data to be supplied by the plugin.
+#
+# If you find that a line has multiple %s variables which would
+# be in a different order in your language, you can change them
+# to %1$s, %2$s, %4$s, %3$s to change their order. ie: %4$s
+# will always use the 4th variable, no matter where it is
+# placed on the line.
+#
+#
+# A note on text colouring and formatting.
+# ----------------------------------------
+# Black = &0, Navy = &1, Green = &2, Blue = &3, Red = &4
+# Purple = &5, Gold = &6, LightGray = &7, Gray = &8
+# DarkPurple = &9, LightGreen = &a, LightBlue = &b
+# Rose = &c, LightPurple = &d, Yellow = &e, White = &f
+
+townypay.plugin_prefix: '&f[&6TownyPay&f]&r '
+
+### General
+townypay.general.NoPermission: 'You do not have permission to run this command'
+townypay.general.finance: 'Budget: %1$s Spend: %2$s Remaining: %3$s'
+townypay.general.PayCommandFail.Self: 'You cannot pay yourself!'
+townypay.general.PayCommandFail.Mayor: 'You cannot pay the Mayor!'
+townypay.general.PayCommandFail.King: 'You cannot pay the King!'
+townypay.general.PayCommandFail.Error: 'Invalid command, correct usage - /town pay [player] [amount]'
+townypay.general.PlayerNotFound: 'No such player is recorded on this server'
+townypay.general.ValueError: 'Please provide a whole number as the pay value'
+townypay.general.NotEnoughRemaining: 'You do not have enough money in the budget remaining!'
+townypay.general.NotEnoughBalance: 'There is not enough money in the bank to pay!'
+townypay.general.OverBudget: 'You cannot pay more than the budget!'
+townypay.general.PaymentReceived: 'You received a payment from %1$s. Value: %2$s. Tax Collected: %3$s'
+townypay.general.PaymentSend: 'You sent a payment to %1$s. Value: %2$s'
+  
+### Town
+townypay.town.PayReason: 'Mayor Pay'
+townypay.town.PayTaxReason: 'Mayor Pay Tax'
+townypay.town.BudgetPaymentReason: '%1$s sent a Town Payment sent to %2$s'
+townypay.town.BudgetPaymentTaxReason: 'Tax of Town Payment from %s'
+
+### Nation
+townypay.nation.PayReason: 'King Pay'
+townypay.nation.PayTaxReason: 'King Pay Tax'
+townypay.nation.BudgetPaymentReason: 'Sent a Nation Payment sent to %s'
+townypay.nation.BudgetPaymentTaxReason: 'Tax of Nation Payment from %s'
+
+### Status Logs
+townypay.status.log.plugin.Enabled: '&aPlugin Enabled'
+townypay.status.log.plugin.Disabled: '&aPlugin Disabled'
+townypay.status.log.notowns: 'There are no towns - skipping TownyPay for towns'
+townypay.status.log.nonations: 'There are no nations - skipping TownyPay for nations'
+townypay.status.log.mayorpaydisabled: 'Mayor Pay Disabled - skipping paying Mayors'
+townypay.status.log.kingpaydisabled: 'King Pay Disabled - skipping paying King'
+townypay.status.log.mayorpay.start: 'Paying all Mayors'
+townypay.status.log.mayorpay.end: 'Mayor Payments Complete'
+townypay.status.log.kingpay.start: 'Paying all Kings'
+townypay.status.log.kingpay.end: 'King Payments Complete'
+townypay.status.log.nobalance.town: '%s has no balance to pay Mayor'
+townypay.status.log.nobalance.nation: '%s has no balance to pay King'
+townypay.status.log.nomayor: '%s has no Mayor to pay'
+townypay.status.log.noking: '%s has no King to pay'
+townypay.status.log.mayorpay: 'Mayor Payment for %1$s of %2$s made to %3$s tax: %4$s'
+townypay.status.log.kingpay: 'King Payment for %1$s of %2$s made to %3$s tax: %4$s'
+townypay.status.log.townbudget.start: 'Setting Town Budgets'
+townypay.status.log.townbudget.end: 'Town Budgets Complete'
+townypay.status.log.nationbudget.start: 'Setting Nation Budgets'
+townypay.status.log.nationbudget.end: 'Town Nation Complete'
+townypay.status.log.settingbudget: 'Setting budget for %1$s to %2$s | Spend: %3$s'
+townypay.status.log.town.paymentsent: 'Town payment sent from %1$s to %2$s for %3$s tax: %4$s'
+townypay.status.log.nation.paymentsent: 'Nation payment sent from %1$s to %2$s for %3$s tax: %4$s'

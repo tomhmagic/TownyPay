@@ -1,0 +1,6 @@
+name: TownyPay
+version: '${project.version}'
+main: com.tanukicraft.townypay.TownyPay
+api-version: '1.20'
+load: POSTWORLD
+depend: [Towny]
