@@ -12,10 +12,14 @@ On my server I have disabled bank withdrawals to prevent rogue Mayors/Kings and 
 To allow Mayors/Kings to pay other players, TownyPay introduces a pay command to pay from the town/nation bank within a daily budget.
 
 For Towny Admins:
+
 Mayor and King pay can be configured to be either fixed or a percentage of the town profit.
 Profit is calculated as CurrentBalance – (Upkeep x ConfiguredNumber)
 
+
 Commands and Permissions:
+
+You will need to add the permissions to all town and nation ranks you want access to these commands, at least Mayor, but you could add them to assistant, and even a Treasurer rank.
 
 | Command | Permission | Description |
 | --- | --- | --- |
