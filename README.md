@@ -1,7 +1,9 @@
 # TownyPay
 
 Created for my server TanukiCraft
+
 play.tanukicraft.net
+
 https://discord.gg/zd7pvJY9Zr
 
 A plugin that pays Mayors and Kings on every new Towny day and create a daily budget that can be spent.
