@@ -14,8 +14,8 @@ Mayor and King pay can be configured to be either fixed or a percentage of the t
 Profit is calculated as CurrentBalance – (Upkeep x ConfiguredNumber)
 
 Commands and Permissions:
-`/town pay [resident] [amount]` | townypay.command.town.pay | Pays given resident the chosen amount from the town bank, if within budget.
-`/town finance` | townypay.command.town.finance | Showes town budget information (Budget, Spend and Remaining)
+|`/town pay [resident] [amount]` | townypay.command.town.pay | Pays given resident the chosen amount from the town bank, if within budget.|
+|`/town finance` | townypay.command.town.finance | Showes town budget information (Budget, Spend and Remaining)|
 
 `/nation pay [resident] [amount]` | townypay.command.nation.pay | Pays given resident the chosen amount from the town bank, if within budget.
 `/nation finance` | townypay.command.nation.finance | Showes nation budget information (Budget, Spend and Remaining)
