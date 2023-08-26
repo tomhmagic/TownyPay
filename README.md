@@ -25,8 +25,8 @@ You will need to add the permissions to all town and nation ranks you want acces
 | Command | Permission | Description |
 | ------------------------------------------ | -------------- | --- |
 |`/town pay [resident] [amount]` | `townypay.command.town.pay` | Pays given resident the chosen amount from the town bank, if within budget.|
-|`/town finance` | `townypay.command.town.finance` | Showes town budget information (Budget, Spend and Remaining)|
+|`/town finance` | `townypay.command.town.finance` | Shows town budget information (Budget, Spend and Remaining)|
 |`/nation pay [resident] [amount]` | `townypay.command.nation.pay` | Pays given resident the chosen amount from the town bank, if within budget.|
-|`/nation finance` | `townypay.command.nation.finance` | Showes nation budget information (Budget, Spend and Remaining)|
+|`/nation finance` | `townypay.command.nation.finance` | Shows nation budget information (Budget, Spend and Remaining)|
 
 
