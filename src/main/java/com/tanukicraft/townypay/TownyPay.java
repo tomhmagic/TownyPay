@@ -5,19 +5,25 @@ import com.palmergames.bukkit.towny.TownyCommandAddonAPI;
 import com.palmergames.bukkit.towny.exceptions.KeyAlreadyRegisteredException;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.exceptions.initialization.TownyInitException;
+import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.object.TownyPermissionChange;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
+import com.palmergames.bukkit.towny.object.metadata.BooleanDataField;
 import com.palmergames.bukkit.towny.object.metadata.IntegerDataField;
-import com.tanukicraft.townypay.commands.NationFinanceAddon;
-import com.tanukicraft.townypay.commands.NationPayAddon;
-import com.tanukicraft.townypay.commands.TownFinanceAddon;
-import com.tanukicraft.townypay.commands.TownPayAddon;
+import com.palmergames.bukkit.towny.permissions.TownyPerms;
+import com.palmergames.bukkit.util.Colors;
+import com.palmergames.bukkit.util.Version;
+import com.tanukicraft.townypay.commands.*;
 import com.tanukicraft.townypay.listeners.TownyNewDayEventListener;
+import com.tanukicraft.townypay.metadata.MayorPayMetaDataController;
+import com.tanukicraft.townypay.settings.NationSettings;
+import com.tanukicraft.townypay.settings.TownSettings;
 import com.tanukicraft.townypay.util.TownyPayMessageUtil;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.nio.file.Path;
@@ -28,15 +34,10 @@ public final class TownyPay extends JavaPlugin {
 
     private File customConfigFile;
     private FileConfiguration customConfig;
-
-    // Parts of a datafield
-    private static String BudgetKeyName = "TownyPayBudget"; // This key must be unique to your plugin.
-    private static String SpendKeyName = "TownyPaySpend";
-    private static int defaultVal = 0; // This is the default value your data field will have whenever it's added to an object.
-    private static final String Budgetlabel = "Budget"; // Label that will be displayed when the towny object's status is shown.
-    private static final String Spendlabel = "Spend";
-
+    private static Version requiredTownyVersion = Version.fromString("0.99.5.0");
     private static TownyPay plugin;
+
+
     public TownyPay() {
         plugin = this;
     }
@@ -44,56 +45,51 @@ public final class TownyPay extends JavaPlugin {
         return plugin;
     }
 
-    // Use those parts to create a new data field to store an integer
-    private static IntegerDataField TownyPayBudgetField = new IntegerDataField(BudgetKeyName, defaultVal, Budgetlabel);
-    private static IntegerDataField TownyPaySpendField = new IntegerDataField(SpendKeyName, defaultVal, Spendlabel);
+
     // Called when the plugin first loads.
     @Override
     public void onLoad() {
-        // (Optional) Try to globally register the data field.
-        // Globally registering data fields allow them to be modified in-game by administrators.
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPayBudgetField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPaySpendField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-
-        getLogger().info("Custom data field successfully registered!");
-    }
-    public static IntegerDataField getTownyPayBudgetField() {
-        return TownyPayBudgetField;
-    }
-    public static IntegerDataField getTownyPaySpendField() {
-        return TownyPaySpendField;
+        loadCustomDataField();
     }
     @Override
     public void onEnable() {
         // Plugin startup logic
-        createPluginFolder();
-        this.saveDefaultConfig();
-        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.TOWN, "finance", new TownFinanceAddon());
-        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.TOWN, "pay", new TownPayAddon());
-        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.NATION, "finance", new NationFinanceAddon());
-        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.NATION, "pay", new NationPayAddon());
-        getServer().getPluginManager().registerEvents(new TownyNewDayEventListener(), this);
-        try {
-            loadLocalization(false);
-        } catch (TownyException e) {
-            throw new RuntimeException(e);
-        }
 
-        TownyPayMessageUtil.logStatus(Translatable.of("townypay.status.log.plugin.Enabled"));
+        if (!loadAll())
+            onDisable();
     }
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
-        getServer().getConsoleSender().sendMessage(ChatColor.GOLD + "[TownyPay]: " + ChatColor.RED + "Plugin Disabled");
-        TownyPayMessageUtil.logError(Translatable.of("townypay.status.log.plugin.Disabled"));
+    }
+    /**
+     * Load towny pay
+     *
+     * @return true if load succeeded
+     */
+    public boolean loadAll() {
+        try {
+            printArt();
+            townyVersionCheck();
+            loadConfig();
+            //Load languages
+            loadLocalization(false);
+
+            //Load commands and listeners
+            registerCommands();
+            registerListeners();
+
+        } catch (TownyException te) {
+            severe(te.getMessage());
+            severe("TownyPay failed to load! Disabling!");
+            return false;
+        } catch (Exception e) {
+            severe(e.getMessage());
+            e.printStackTrace();
+            severe("TownyPay failed to load! Disabling!");
+            return false;
+        }
+        info("TownyPay loaded successfully.");
+        return true;
     }
     public void createPluginFolder(){
         File f = new File(this.getDataFolder() + "/");
@@ -114,7 +110,96 @@ public final class TownyPay extends JavaPlugin {
             info(Translatable.of("msg_reloaded_lang").defaultLocale());
         }
     }
+    private void printArt() {
+        Bukkit.getConsoleSender().sendMessage("");
+        Bukkit.getConsoleSender().sendMessage(              "       ----------------------------------------  ");
+        Bukkit.getConsoleSender().sendMessage(Colors.Gold + "          ┌╫─ ╺┳╸┏━┓╻ ╻┏┓╻╻ ╻  ┏━┓┏━┓╻ ╻ ┌╫─     ");
+        Bukkit.getConsoleSender().sendMessage(Colors.Gold + "          └╫┐  ┃ ┃ ┃┃╻┃┃┃┃┗┳┛  ┣━┛┣━┫┗┳┛ └╫┐     ");
+        Bukkit.getConsoleSender().sendMessage(Colors.Gold + "          ─╫┘  ╹ ┗━┛┗┻┛╹┗┛ ╹   ╹  ╹ ╹ ╹  ─╫┘     ");
+        Bukkit.getConsoleSender().sendMessage(              "       ----------------------------------------  ");
+        Bukkit.getConsoleSender().sendMessage("");
+    }
+
+    private void registerListeners() {
+        PluginManager pm = Bukkit.getServer().getPluginManager();
+        pm.registerEvents(new TownyNewDayEventListener(), this);
+    }
+
+    private void registerCommands() {
+        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.TOWN, "finance", new TownFinanceAddon());
+        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.TOWN, "pay", new TownPayAddon());
+        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.NATION, "finance", new NationFinanceAddon());
+        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.NATION, "pay", new NationPayAddon());
+        TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.RESIDENT, "pay", new ResidentPayAddon());
+
+        if (TownSettings.canSetPay()){
+            TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.TOWN_SET, "pay", new TownPaySetAddon());
+        }
+        if (NationSettings.canSetPay()){
+            TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.TOWN_SET, "pay", new NationPaySetAddon());
+        }
+        if (TownSettings.canTogglePay()){
+            TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.TOWN_TOGGLE, "pay", new TownPayToggleAddon());
+        }
+        if (NationSettings.canTogglePay()){
+            TownyCommandAddonAPI.addSubCommand(TownyCommandAddonAPI.CommandType.NATION_TOGGLE, "pay", new NationPayToggleAddon());
+        }
+
+    }
+
+    private void loadConfig(){
+        createPluginFolder();
+        this.saveDefaultConfig();
+    }
+
+    private String getTownyVersion() {
+        return Bukkit.getPluginManager().getPlugin("Towny").getDescription().getVersion();
+    }
+    private void townyVersionCheck() throws TownyException{
+        if (!(Version.fromString(getTownyVersion()).compareTo(requiredTownyVersion) >= 0))
+            throw new TownyException("Towny version does not meet required minimum version: " + requiredTownyVersion.toString());
+    }
+    public static void severe(String message) {
+        plugin.getLogger().severe(message);
+    }
     public static void info(String message) {
         plugin.getLogger().info(message);
     }
+
+
+    // Parts of a datafield
+
+    // Use those parts to create a new data field to store an integer
+    private static IntegerDataField TownyPayBudgetField = new IntegerDataField("TownyPayBudget", 0, "Budget");
+    private static IntegerDataField TownyPaySpendField = new IntegerDataField("TownyPaySpend", 0, "Spend");
+    private static IntegerDataField TownyPaySetPayField = new IntegerDataField("TownyPaySetPay", 0, "Pay");
+    private static BooleanDataField TownyPayToggleField = new BooleanDataField("TownyPayToggle", true, "Pay Toggle");
+
+    private void loadCustomDataField(){
+        // (Optional) Try to globally register the data field.
+        // Globally registering data fields allow them to be modified in-game by administrators.
+        try {
+            TownyAPI.getInstance().registerCustomDataField(TownyPayBudgetField);
+        } catch (KeyAlreadyRegisteredException e) {
+            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
+        }
+        try {
+            TownyAPI.getInstance().registerCustomDataField(TownyPaySpendField);
+        } catch (KeyAlreadyRegisteredException e) {
+            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
+        }
+        try {
+            TownyAPI.getInstance().registerCustomDataField(TownyPaySetPayField);
+        } catch (KeyAlreadyRegisteredException e) {
+            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
+        }
+        try {
+            TownyAPI.getInstance().registerCustomDataField(TownyPayToggleField);
+        } catch (KeyAlreadyRegisteredException e) {
+            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
+        }
+
+        getLogger().info("Custom data fields successfully registered!");
+    }
+
 }

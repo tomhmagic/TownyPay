@@ -2,12 +2,11 @@ package com.tanukicraft.townypay.commands;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.command.BaseCommand;
-import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.tanukicraft.townypay.metadata.TownBudgetMetaDataController;
-import com.tanukicraft.townypay.settings.TownyPaySettings;
+import com.tanukicraft.townypay.settings.TownSettings;
 import com.tanukicraft.townypay.util.GeneralUtil;
 import com.tanukicraft.townypay.util.TownyPayMessageUtil;
 import org.bukkit.command.Command;
@@ -44,21 +43,9 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
                     Resident targetRes = TownyAPI.getInstance().getResident(target);
                     Resident senderRes = TownyAPI.getInstance().getResident((Player) commandSender);
 
-                    Town targetTown = null;
-                    if (targetRes.hasTown()){
-                        try {
-                            targetTown = targetRes.getTown();
-                        } catch (TownyException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+                    Town targetTown = GeneralUtil.getTown(targetRes);
+                    Town senderTown = GeneralUtil.getTown(senderRes);
 
-                    Town senderTown;
-                    try {
-                        senderTown = senderRes.getTown();
-                    } catch (TownyException e) {
-                        throw new RuntimeException(e);
-                    }
                     //if no budget data, set 0
                     if (!TownBudgetMetaDataController.hasBudgetData(senderTown)){
                         TownBudgetMetaDataController.setBudgetData(senderTown,0);
@@ -71,7 +58,7 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
                     if (targetRes == senderRes){ //stop payments to self
                         TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Self"));
                         return false;
-                    } else if (targetTown != null & targetTown == senderTown & targetRes.isMayor()) { // stop payments to the town mayor
+                    } else if (targetTown != null & GeneralUtil.isSameTown(targetTown, senderTown) & targetRes.isMayor()) { // stop payments to the town mayor
                         TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Mayor"));
                         return false;
                     } else {
@@ -91,13 +78,9 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
                             TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughBalance"));
                             return false;
                         } else { //pay given player
-                            double tax;
-                            if(targetTown == null){ //if part of town
-                                tax = TownyPaySettings.getTownPayOutsiderTax();
-                            } else if (targetTown == senderTown ){
-                                tax = TownyPaySettings.getTownPayTax();
-                            } else{ //if not part of town
-                                tax = TownyPaySettings.getTownPayOutsiderTax();
+                            double tax = TownSettings.getOutsiderTax();
+                            if(targetTown != null & GeneralUtil.isSameTown(targetTown, senderTown)) { //if part of town
+                                tax = TownSettings.getResidentTax();
                             }
                             
                             double calcTax = (pay / 100) * tax;
@@ -120,7 +103,7 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
                     }
                 }
             } else { //syntax error
-                TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Error"));
+                TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.town.CommandFail.pay"));
                 return false;
             }
 

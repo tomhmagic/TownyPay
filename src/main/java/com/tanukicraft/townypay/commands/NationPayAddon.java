@@ -7,7 +7,7 @@ import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.tanukicraft.townypay.metadata.NationBudgetMetaDataController;
-import com.tanukicraft.townypay.settings.TownyPaySettings;
+import com.tanukicraft.townypay.settings.NationSettings;
 import com.tanukicraft.townypay.util.GeneralUtil;
 import com.tanukicraft.townypay.util.TownyPayMessageUtil;
 import org.bukkit.command.Command;
@@ -43,21 +43,9 @@ public class NationPayAddon extends BaseCommand implements CommandExecutor, TabC
                     Resident targetRes = TownyAPI.getInstance().getResident(target);
                     Resident senderRes = TownyAPI.getInstance().getResident((Player) commandSender);
 
-                    Nation targetNation = null;
-                    if (targetRes.hasNation()){
-                        try {
-                            targetNation = targetRes.getNation();
-                        } catch (TownyException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+                    Nation targetNation = GeneralUtil.getNation(targetRes);
+                    Nation senderNation = GeneralUtil.getNation(senderRes);
 
-                    Nation senderNation;
-                    try {
-                        senderNation = senderRes.getNation();
-                    } catch (TownyException e) {
-                        throw new RuntimeException(e);
-                    }
                     //if no budget data, set 0
                     if (!NationBudgetMetaDataController.hasBudgetData(senderNation)){
                         NationBudgetMetaDataController.setBudgetData(senderNation,0);
@@ -70,7 +58,7 @@ public class NationPayAddon extends BaseCommand implements CommandExecutor, TabC
                     if (targetRes == senderRes){ //stop payments to self
                         TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Self"));
                         return false;
-                    } else if (targetNation != null & targetNation == senderNation & targetRes.isMayor()) { // stop payments to the town mayor
+                    } else if (targetNation != null & GeneralUtil.isSameNation(targetNation, senderNation) & targetRes.isMayor()) { // stop payments to the town mayor
                         TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Mayor"));
                         return false;
                     } else {
@@ -90,13 +78,9 @@ public class NationPayAddon extends BaseCommand implements CommandExecutor, TabC
                             TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughBalance"));
                             return false;
                         } else { //pay given player
-                            double tax;
-                            if(targetNation == null){ //if part of town
-                                tax = TownyPaySettings.getNationPayOutsiderTax();
-                            } else if (targetNation == senderNation ){
-                                tax = TownyPaySettings.getNationPayTax();
-                            } else{ //if not part of town
-                                tax = TownyPaySettings.getNationPayOutsiderTax();
+                            double tax = NationSettings.getOutsiderTax();
+                            if(targetNation != null & GeneralUtil.isSameNation(targetNation, senderNation)) { //if part of town
+                                tax = NationSettings.getResidentTax();
                             }
 
                             double calcTax = (pay / 100) * tax;
@@ -119,7 +103,7 @@ public class NationPayAddon extends BaseCommand implements CommandExecutor, TabC
                     }
                 }
             } else { //syntax error
-                TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Error"));
+                TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.nation.CommandFail.pay"));
                 return false;
             }
 

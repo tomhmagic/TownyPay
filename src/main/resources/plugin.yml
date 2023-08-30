@@ -1,8 +1,38 @@
 name: TownyPay
-version: '${project.version}'
+version: ${project.version}
 main: com.tanukicraft.townypay.TownyPay
 api-version: '1.20'
+author: 'Tomhmagic'
 load: POSTWORLD
 depend: [Towny]
 
 description: This is a plugin that create a daily pay for Mayors and Kings, and creates a daily budget for Towns and Nations to spend.
+
+permissions:
+  townypay.command.resident.pay:
+    description: Resident is able to send payments to another resident.
+    default: true
+  townypay.command.town.pay:
+    description: Resident is able to send payments to another resident from the town Bank.
+    default: false
+  townypay.command.nation.pay:
+    description: Resident is able to send payments to another resident from the nation bank.
+    default: false
+  townypay.command.town.finance:
+    description: Resident is able to view the town finances.
+    default: false
+  townypay.command.nation.finance:
+    description: Resident is able to view the nation finances.
+    default: false
+  townypay.command.town.setpay:
+    description: Resident is able to view the set Mayor Pay.
+    default: false
+  townypay.command.nation.setpay:
+    description: Resident is able to view the set King Pay.
+    default: false
+  townypay.command.town.togglepay:
+    description: Resident is able to view the toggle Mayor Pay.
+    default: false
+  townypay.command.nation.togglepay:
+    description: Resident is able to view the toggle King Pay.
+    default: false
