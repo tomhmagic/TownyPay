@@ -72,8 +72,10 @@ public class SavingsFunctions {
         }
         int currentSavings = SavingsMetaDataController.getSavingsData(resident);
         if (currentSavings >= SavingsSettings.getSavingLimitsMin()){
-            resident.getAccount().deposit(interest, String.valueOf(Translatable.of("townypay.Savings.InterestPayment", interest)));
-            MessageUtil.logStatus(Translatable.of("townypay.status.log.Savings.InterestPayment", resident, interest, currentSavings));
+            if (currentSavings < SavingsSettings.getSavingLimitsCap() || SavingsSettings.getSavingLimitsCap() == -1) {
+                SavingsMetaDataController.setSavingsData(resident, currentSavings + (int) interest);
+                MessageUtil.logStatus(Translatable.of("townypay.status.log.Savings.InterestPayment", resident, interest, currentSavings));
+            }
         }
     }
     private static void moveHoldings(Resident resident){

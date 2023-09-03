@@ -61,8 +61,8 @@ public class ResidentPayAddon extends BaseCommand implements CommandExecutor, Ta
                             Nation senderNation = GeneralUtil.getNation(senderRes);
 
                             double tax = ResidentSettings.getOutsiderTax();
-                            if(targetTown == null | targetNation == null) { //if not part of town or nation
-                                if (GeneralUtil.isSameTown(targetTown, senderTown) | GeneralUtil.isSameNation(targetNation, senderNation)){
+                            if(targetTown == null || targetNation == null) { //if not part of town or nation
+                                if (GeneralUtil.isSameTown(targetTown, senderTown) || GeneralUtil.isSameNation(targetNation, senderNation)){
                                     tax = ResidentSettings.getResidentTax();
                                 }
                             }

@@ -20,6 +20,9 @@ public class SavingsSettings {
     public static int getSavingLimitsMax(){
         return config.getInt("SavingsSettings.Limits.Savings.Maximum");
     }
+    public static int getSavingLimitsCap(){
+        return config.getInt("SavingsSettings.Limits.Savings.Cap");
+    }
     public static int getHoldingsLimitsMin(){
         return config.getInt("SavingsSettings.Limits.Holdings.Minimum");
     }

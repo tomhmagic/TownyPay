@@ -25,7 +25,8 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
         Resident res = TownyAPI.getInstance().getResident((Player) commandSender);
         commandSender.sendMessage("DEBUG: length = " + strings.length);
         commandSender.sendMessage("DEBUG: arg0 = " + strings[0]);
-        commandSender.sendMessage("DEBUG: arg1 = " + strings[1]);
+        //commandSender.sendMessage("DEBUG: arg1 = " + strings[1]);
+        commandSender.sendMessage("DEBUG: s???? = " + s);
         assert res != null;
         if (res.hasPermissionNode("townypay.command.resident.savings")) {
 
@@ -88,7 +89,7 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
         } else {
             int newHoldings = currentHoldings + amount;
             SavingsMetaDataController.setHoldingsData(resident,newHoldings);
-            MessageUtil.sendMsg(sender, Translatable.of("townypay.Resident.Savings.Deposit", currentHoldings, newHoldings));
+            MessageUtil.sendMsg(sender, Translatable.of("townypay.Resident.Savings.Deposit", amount, newHoldings));
         }
     }
 

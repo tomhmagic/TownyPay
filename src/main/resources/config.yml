@@ -122,11 +122,13 @@ SavingsSettings:
 
   Limits:
     Savings:
-      #Minimum savings required for interest
+      #Minimum savings required for interest, cannot be negative
       Minimum: 100
       #Maximum amount of savings allowed. Set to -1 to disable. Doesn't apply to interest payments, once the maximum has reached, interest will still continue.
       #This is used when transferring to holdings to ensure Savings+Holdings is doesn't go over maximum
       Maximum: 10000
+      #Full cap on how much money will earn interest. Set to -1 to disable.
+      Cap: 50000
     Holdings:
       #Minimum amount to be able to transfer to holdings
       Minimum: 1

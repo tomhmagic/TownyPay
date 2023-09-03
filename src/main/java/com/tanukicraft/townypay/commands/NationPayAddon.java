@@ -16,18 +16,20 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class NationPayAddon extends BaseCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Resident res = TownyAPI.getInstance().getResident((Player) commandSender);
+        assert res != null;
         if (res.hasPermissionNode("townypay.command.nation.pay") & res.hasTown()) { //check for perm
 
             String target = null;
             try {
-                target = TownyAPI.getInstance().getResident(strings[0]).toString();
-            } catch (Exception e) {
+                target = Objects.requireNonNull(TownyAPI.getInstance().getResident(strings[0])).toString();
+            } catch (Exception ignored) {
             }
             if(strings.length == 2){ //check player and value was given
                 if (target == null) { //if no valid player was given
@@ -42,7 +44,9 @@ public class NationPayAddon extends BaseCommand implements CommandExecutor, TabC
                     Resident targetRes = TownyAPI.getInstance().getResident(target);
                     Resident senderRes = TownyAPI.getInstance().getResident((Player) commandSender);
 
+                    assert targetRes != null;
                     Nation targetNation = GeneralUtil.getNation(targetRes);
+                    assert senderRes != null;
                     Nation senderNation = GeneralUtil.getNation(senderRes);
 
                     //if no budget data, set 0
@@ -82,7 +86,7 @@ public class NationPayAddon extends BaseCommand implements CommandExecutor, TabC
                                 tax = NationSettings.getResidentTax();
                             }
 
-                            double calcTax = (pay / 100) * tax;
+                            double calcTax = ((double) pay / 100) * tax;
 
                             //remove money from the town bank and send it to the player
                             senderNation.getAccount().payTo(pay, targetRes.getAccount(), String.valueOf(Translatable.of("townypay.nation.BudgetPaymentReason")));
