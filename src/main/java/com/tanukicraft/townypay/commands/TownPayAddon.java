@@ -8,7 +8,7 @@ import com.palmergames.bukkit.towny.object.Translatable;
 import com.tanukicraft.townypay.metadata.TownBudgetMetaDataController;
 import com.tanukicraft.townypay.settings.TownSettings;
 import com.tanukicraft.townypay.util.GeneralUtil;
-import com.tanukicraft.townypay.util.TownyPayMessageUtil;
+import com.tanukicraft.townypay.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,10 +32,10 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
             }
             if(strings.length == 2){ //check player and value was given
                 if (target == null) { //if no valid player was given
-                    TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PlayerNotFound"));
+                    MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PlayerNotFound"));
                     return false;
                 } else if (GeneralUtil.isNotInteger(strings[1])){ //check value is an int
-                    TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
+                    MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
                     return false;
 
                 } else { //pay target checks
@@ -56,10 +56,10 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
                     }
 
                     if (targetRes == senderRes){ //stop payments to self
-                        TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Self"));
+                        MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Self"));
                         return false;
                     } else if (targetTown != null & GeneralUtil.isSameTown(targetTown, senderTown) & targetRes.isMayor()) { // stop payments to the town mayor
-                        TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Mayor"));
+                        MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Mayor"));
                         return false;
                     } else {
                         //main logic
@@ -69,13 +69,13 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
                         int pay = Integer.parseInt(strings[1]);
 
                         if (pay > budget){ //if pay amount is more than the actual budget
-                            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.OverBudget"));
+                            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.OverBudget"));
                             return false;
                         } else if (pay > remaining){ //if the pay amount is more than the remaining budget
-                            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughRemaining"));
+                            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughRemaining"));
                             return false;
                         } else if (pay > senderTown.getAccount().getHoldingBalance()){ //if the pay amount is more than the bank balance
-                            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughBalance"));
+                            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughBalance"));
                             return false;
                         } else { //pay given player
                             double tax = TownSettings.getOutsiderTax();
@@ -91,24 +91,24 @@ public class TownPayAddon extends BaseCommand implements CommandExecutor, TabCom
                             targetRes.getAccount().withdraw(calcTax, String.valueOf(Translatable.of("townypay.town.BudgetPaymentTaxReason")));
                             //message the player
                             Player targetPlayer = targetRes.getPlayer();
-                            TownyPayMessageUtil.sendPlayerMsg(targetPlayer,Translatable.of("townypay.general.PaymentReceived",senderTown, pay, tax));
+                            MessageUtil.sendPlayerMsg(targetPlayer,Translatable.of("townypay.general.PaymentReceived",senderTown, pay, tax));
                             //message the sender
-                            TownyPayMessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.PaymentSend", targetRes, pay));
+                            MessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.PaymentSend", targetRes, pay));
 
                             //update spend data
                             int updatedSpend = TownBudgetMetaDataController.getSpendData(senderTown) + pay;
                             TownBudgetMetaDataController.setSpendData(senderTown, updatedSpend);
-                            TownyPayMessageUtil.logStatus(Translatable.of("townypay.status.log.town.paymentsent", senderTown, targetRes, pay, tax));
+                            MessageUtil.logStatus(Translatable.of("townypay.status.log.town.paymentsent", senderTown, targetRes, pay, tax));
                         }
                     }
                 }
             } else { //syntax error
-                TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.town.CommandFail.pay"));
+                MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.town.CommandFail.pay"));
                 return false;
             }
 
         }else { //no perms
-            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
+            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
             return false;
         }
         return false;

@@ -8,7 +8,7 @@ import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.tanukicraft.townypay.settings.ResidentSettings;
 import com.tanukicraft.townypay.util.GeneralUtil;
-import com.tanukicraft.townypay.util.TownyPayMessageUtil;
+import com.tanukicraft.townypay.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,10 +31,10 @@ public class ResidentPayAddon extends BaseCommand implements CommandExecutor, Ta
             }
             if(strings.length == 2){ //check player and value was given
                 if (target == null) { //if no valid player was given
-                    TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PlayerNotFound"));
+                    MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PlayerNotFound"));
                     return false;
                 } else if (GeneralUtil.isNotInteger(strings[1])){ //check value is an int
-                    TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
+                    MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
                     return false;
 
                 } else { //pay target checks
@@ -44,14 +44,14 @@ public class ResidentPayAddon extends BaseCommand implements CommandExecutor, Ta
 
 
                     if (targetRes == senderRes){ //stop payments to self
-                        TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Self"));
+                        MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.PayCommandFail.Self"));
                         return false;
                     } else {
                         //main logic
                         int pay = Integer.parseInt(strings[1]);
 
                         if (pay > res.getAccount().getHoldingBalance()){ //if the pay amount is more than the players balance
-                            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughMoney"));
+                            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NotEnoughMoney"));
                             return false;
                         } else { //pay given player
 
@@ -76,20 +76,20 @@ public class ResidentPayAddon extends BaseCommand implements CommandExecutor, Ta
                             targetRes.getAccount().withdraw(calcTax, String.valueOf(Translatable.of("townypay.Resident.PaymentTaxReason")));
                             //message the player
                             Player targetPlayer = targetRes.getPlayer();
-                            TownyPayMessageUtil.sendPlayerMsg(targetPlayer,Translatable.of("townypay.general.PaymentReceived",senderRes, pay, tax));
+                            MessageUtil.sendPlayerMsg(targetPlayer,Translatable.of("townypay.general.PaymentReceived",senderRes, pay, tax));
                             //message the sender
-                            TownyPayMessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.PaymentSend", targetRes, pay));
+                            MessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.PaymentSend", targetRes, pay));
 
                         }
                     }
                 }
             } else { //syntax error
-                TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.Resident.CommandFail.pay"));
+                MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.Resident.CommandFail.pay"));
                 return false;
             }
 
         }else { //no perms
-            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
+            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
             return false;
         }
         return false;

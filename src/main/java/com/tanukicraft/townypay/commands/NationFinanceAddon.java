@@ -6,7 +6,7 @@ import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.tanukicraft.townypay.metadata.NationBudgetMetaDataController;
-import com.tanukicraft.townypay.util.TownyPayMessageUtil;
+import com.tanukicraft.townypay.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,10 +30,10 @@ public class NationFinanceAddon implements CommandExecutor {
             int budget = NationBudgetMetaDataController.getBudgetData(nation);
             int spend = NationBudgetMetaDataController.getSpendData(nation);
             int remaining = budget - spend;
-            TownyPayMessageUtil.sendMsg(commandSender, Translatable.of("townypay.general.finance", budget, spend, remaining));
+            MessageUtil.sendMsg(commandSender, Translatable.of("townypay.general.finance", budget, spend, remaining));
             return true;
         } else {
-            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
+            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
             return false;
         }
     }

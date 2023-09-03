@@ -10,15 +10,19 @@ public class MayorPayMetaDataController {
     private static BooleanDataField toggleBDF = new BooleanDataField("TownyPaySetPay", true);
 
     public static boolean hasPayData(Town town){
+
         return MetaDataUtil.hasMeta(town,payIDF);
     }
     public static boolean hasToggleData(Town town){
+
         return MetaDataUtil.hasMeta(town,toggleBDF);
     }
     public static int getPayData(Town town){
+
         return MetaDataUtil.getInt(town, payIDF);
     }
     public static boolean getToggleData(Town town){
+
         return MetaDataUtil.getBoolean(town, toggleBDF);
     }
     public static void setPayData(Town town, Integer data){

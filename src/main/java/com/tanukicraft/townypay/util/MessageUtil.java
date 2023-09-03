@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import static org.bukkit.Bukkit.getServer;
 
-public class TownyPayMessageUtil {
+public class MessageUtil {
     public static void logStatus(Translatable message){
         getServer().getConsoleSender().sendMessage(String.valueOf(Translatable.of("townypay.plugin_prefix").append(Component.text(""))) + ChatColor.WHITE + message);
     }

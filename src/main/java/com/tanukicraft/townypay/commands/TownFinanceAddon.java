@@ -10,7 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.tanukicraft.townypay.util.TownyPayMessageUtil;
+import com.tanukicraft.townypay.util.MessageUtil;
 
 public class TownFinanceAddon implements CommandExecutor {
     @Override
@@ -27,10 +27,10 @@ public class TownFinanceAddon implements CommandExecutor {
             int budget = TownBudgetMetaDataController.getBudgetData(town);
             int spend = TownBudgetMetaDataController.getSpendData(town);
             int remaining = budget - spend;
-            TownyPayMessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.finance", budget, spend, remaining));
+            MessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.finance", budget, spend, remaining));
             return true;
         } else {
-            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
+            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
             return false;
         }
     }

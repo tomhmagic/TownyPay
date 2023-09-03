@@ -60,4 +60,8 @@ public class GeneralUtil {
             return false;
         }
     }
+
+    public static double calcProfit (Double balance, Double upkeep, Double profitCac){
+        return balance - ((upkeep / 100) * profitCac);
+    }
 }

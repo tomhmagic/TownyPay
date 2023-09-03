@@ -9,7 +9,7 @@ import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.utils.NameUtil;
 import com.tanukicraft.townypay.metadata.MayorPayMetaDataController;
 import com.tanukicraft.townypay.settings.TownSettings;
-import com.tanukicraft.townypay.util.TownyPayMessageUtil;
+import com.tanukicraft.townypay.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -47,18 +47,18 @@ public class TownPayToggleAddon extends BaseCommand implements CommandExecutor, 
                         default:
                             System.out.println("Invalid value");
                     }
-                    TownyPayMessageUtil.sendMsg(commandSender,Translatable.of("townypay.town.PayToggled", value));
+                    MessageUtil.sendMsg(commandSender,Translatable.of("townypay.town.PayToggled", value));
 
                 }else { //syntax error
-                    TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.town.CommandFail.toggle"));
+                    MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.town.CommandFail.toggle"));
                     return false;
                 }
             }else { //no perms
-                TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
+                MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.NoPermission"));
                 return false;
             }
         }else {
-            TownyPayMessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.CommandDisabled"));
+            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.CommandDisabled"));
             return false;
         }
         return false;
