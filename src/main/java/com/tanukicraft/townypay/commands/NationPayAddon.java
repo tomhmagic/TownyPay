@@ -93,8 +93,7 @@ public class NationPayAddon extends BaseCommand implements CommandExecutor, TabC
                             //remove the tax from the player
                             targetRes.getAccount().withdraw(calcTax, String.valueOf(Translatable.of("townypay.nation.BudgetPaymentTaxReason")));
                             //message the player
-                            Player targetPlayer = targetRes.getPlayer();
-                            MessageUtil.sendPlayerMsg(targetPlayer,Translatable.of("townypay.general.PaymentReceived",senderNation, pay, tax));
+                            MessageUtil.sendResidentMsg(targetRes,Translatable.of("townypay.general.PaymentReceived",senderNation, pay, tax));
                             //message the sender
                             MessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.PaymentSend", targetRes, pay));
 

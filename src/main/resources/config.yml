@@ -114,9 +114,9 @@ ResidentSettings:
 #--------------------------------------------#
 SavingsSettings:
   #Base interest used for all nomads and if TownBalanceInterest is disabled
-  BaseInterest: 0.1
+  BaseInterest: 0.5
   #Modifer to work out a variable from Min=BaseInterest-VariableModifier, and Max=BaseInterest+VariableModifier. Set to 0 to disable
-  VariableModifier: 0.1
+  VariableModifier: 0.5
   #Will check if the resident has been online within this many days to give savings interest. Prevents dead accounts receiving interest
   LastOnline: 5
 
@@ -126,9 +126,9 @@ SavingsSettings:
       Minimum: 100
       #Maximum amount of savings allowed. Set to -1 to disable. Doesn't apply to interest payments, once the maximum has reached, interest will still continue.
       #This is used when transferring to holdings to ensure Savings+Holdings is doesn't go over maximum
-      Maximum: 10000
+      Maximum: 50000
       #Full cap on how much money will earn interest. Set to -1 to disable.
-      Cap: 50000
+      Cap: 100000
     Holdings:
       #Minimum amount to be able to transfer to holdings
       Minimum: 1
@@ -148,8 +148,24 @@ SavingsSettings:
       Maximum: 500000
     #Percent interest rates for each threshold, if town does not meet threshold then BaseInterest will be used
     Rates:
-      Minimal: 0.2
-      Low: 0.3
-      Moderate: 0.5
-      High: 0.75
-      Maximum: 1.0
+      Minimal: 0.5
+      Low: 0.75
+      Moderate: 1.0
+      High: 1.5
+      Maximum: 2.0
+
+#--------------------------------------------#
+#          Message Cache Settings            #
+#--------------------------------------------#
+#Messages sent to offline players are cached to be sent when they log back in
+MessageCacheSettings:
+  #Choose how long they players to be inactive before clearing cached messages, set to -1 to disable.
+  ClearCache: 7
+  #Set max message cache, set to -1 to disable.
+  MaxCache: 5
+  #If MaxCache is enabled, choose what method for dealing with extra messages.
+  #Acceptable methods:
+  #FIRST - Remove first message cached
+  #LAST - Remove last message cached
+  #BLOCK - Block the next messages after cache is full
+  ExtraMSG: 'FIRST'

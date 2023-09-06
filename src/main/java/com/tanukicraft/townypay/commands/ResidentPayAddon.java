@@ -17,17 +17,20 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 
 public class ResidentPayAddon extends BaseCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings){
         Resident res = TownyAPI.getInstance().getResident((Player) commandSender);
+        assert res != null;
         if (res.hasPermissionNode("townypay.command.resident.pay")) { //check for perm
 
             String target = null;
             try {
-                target = TownyAPI.getInstance().getResident(strings[0]).toString();
-            } catch (Exception e) {
+                target = Objects.requireNonNull(TownyAPI.getInstance().getResident(strings[0])).toString();
+            } catch (Exception ignored) {
             }
             if(strings.length == 2){ //check player and value was given
                 if (target == null) { //if no valid player was given
@@ -55,7 +58,9 @@ public class ResidentPayAddon extends BaseCommand implements CommandExecutor, Ta
                             return false;
                         } else { //pay given player
 
+                            assert targetRes != null;
                             Town targetTown = GeneralUtil.getTown(targetRes);
+                            assert senderRes != null;
                             Town senderTown = GeneralUtil.getTown(senderRes);
                             Nation targetNation = GeneralUtil.getNation(targetRes);
                             Nation senderNation = GeneralUtil.getNation(senderRes);
@@ -67,7 +72,7 @@ public class ResidentPayAddon extends BaseCommand implements CommandExecutor, Ta
                                 }
                             }
 
-                            double calcTax = (pay / 100) * tax;
+                            double calcTax = ((double) pay / 100) * tax;
 
                             //send money
                             senderRes.getAccount().payTo(pay, targetRes.getAccount(), String.valueOf(Translatable.of("townypay.Resident.PaymentReason")));
@@ -75,8 +80,8 @@ public class ResidentPayAddon extends BaseCommand implements CommandExecutor, Ta
                             //remove the tax from the player
                             targetRes.getAccount().withdraw(calcTax, String.valueOf(Translatable.of("townypay.Resident.PaymentTaxReason")));
                             //message the player
-                            Player targetPlayer = targetRes.getPlayer();
-                            MessageUtil.sendPlayerMsg(targetPlayer,Translatable.of("townypay.general.PaymentReceived",senderRes, pay, tax));
+                            MessageUtil.sendResidentMsg(targetRes,Translatable.of("townypay.general.PaymentReceived",senderRes, pay, tax));
+
                             //message the sender
                             MessageUtil.sendMsg(commandSender,Translatable.of("townypay.general.PaymentSend", targetRes, pay));
 

@@ -6,8 +6,8 @@ import com.palmergames.bukkit.towny.object.metadata.IntegerDataField;
 import com.palmergames.bukkit.towny.utils.MetaDataUtil;
 
 public class MayorPayMetaDataController {
-    private static IntegerDataField payIDF = new IntegerDataField("TownyPaySetPay", 0);
-    private static BooleanDataField toggleBDF = new BooleanDataField("TownyPaySetPay", true);
+    private static IntegerDataField payIDF = new IntegerDataField("TownyPaySet", 0);
+    private static BooleanDataField toggleBDF = new BooleanDataField("TownyPayToggle", true);
 
     public static boolean hasPayData(Town town){
 

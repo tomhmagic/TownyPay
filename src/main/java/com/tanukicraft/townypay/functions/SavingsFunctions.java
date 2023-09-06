@@ -6,10 +6,9 @@ import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.tanukicraft.townypay.metadata.SavingsMetaDataController;
 import com.tanukicraft.townypay.settings.SavingsSettings;
+import com.tanukicraft.townypay.util.GeneralUtil;
 import com.tanukicraft.townypay.util.MessageUtil;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
 
@@ -25,25 +24,22 @@ public class SavingsFunctions {
 
     public static void paySavings(){
 
-        boolean doVariableModifer = false;
+        boolean doVariableModifier = variableModifier > 0.0;
 
-        if (variableModifier > 0.0) {
-            doVariableModifer = true;
-        }
-
-        if (doVariableModifer) {
-            minimalInterest = calcVariableModifier(minimalInterest, variableModifier);
-            lowInterest = calcVariableModifier(lowInterest, variableModifier);
-            moderateInterest = calcVariableModifier(moderateInterest, variableModifier);
-            highInterest = calcVariableModifier(highInterest, variableModifier);
-            maximumInterest = calcVariableModifier(maximumInterest, variableModifier);
-            baseInterest = calcVariableModifier(baseInterest, variableModifier);
+        if (doVariableModifier) {
+            minimalInterest = calcVariableModifier(minimalInterest);
+            lowInterest = calcVariableModifier(lowInterest);
+            moderateInterest = calcVariableModifier(moderateInterest);
+            highInterest = calcVariableModifier(highInterest);
+            maximumInterest = calcVariableModifier(maximumInterest);
+            baseInterest = calcVariableModifier(baseInterest);
         }
 
         List<Resident> residents = TownyAPI.getInstance().getResidents();
+        MessageUtil.logStatus(Translatable.of("townypay.status.log.Savings.start"));
         for (Resident resident: residents){
             double interest = baseInterest;
-            if (doVariableModifer) {
+            if (doVariableModifier) {
                 if (resident.hasTown()) {
                     double balance;
                     int residentCount;
@@ -57,13 +53,12 @@ public class SavingsFunctions {
                     interest = getThresholdInterest(averageBalance,minimalInterest,lowInterest,moderateInterest,highInterest,maximumInterest);
                 }
             }
-            if (isWithinLastOnline(resident)) {
-                MessageUtil.logStatus(Translatable.of("townypay.status.log.Savings.start"));
+            if (GeneralUtil.isWithinLastOnline(resident,SavingsSettings.getLastOnline())) {
                 addInterest(resident, interest);
                 moveHoldings(resident);
-                MessageUtil.logStatus(Translatable.of("townypay.status.log.Savings.end"));
             }
         }
+        MessageUtil.logStatus(Translatable.of("townypay.status.log.Savings.end"));
     }
 
     private static void addInterest(Resident resident, double interest){
@@ -92,9 +87,9 @@ public class SavingsFunctions {
         }
     }
 
-    private static double calcVariableModifier(double baseInterest, double modifier){
-        double minValue = (baseInterest - modifier);
-        double maxValue = (baseInterest + modifier);
+    private static double calcVariableModifier(double baseInterest){
+        double minValue = (baseInterest - SavingsFunctions.variableModifier);
+        double maxValue = (baseInterest + SavingsFunctions.variableModifier);
 
         // Create a random number generator
         Random random = new Random();
@@ -132,20 +127,4 @@ public class SavingsFunctions {
             return baseInterest;
         }
     }
-    private static boolean isWithinLastOnline(Resident resident) {
-        long timestamp = resident.getLastOnline();
-        int daysToSubtract = SavingsSettings.getLastOnline();
-
-        // Calculate the date that is daysToSubtract before the current date
-        LocalDate currentDate = LocalDate.now();
-        LocalDate targetDate = currentDate.minusDays(daysToSubtract);
-
-        // Convert the target date to a timestamp
-        long targetTimestamp = targetDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-        // Check if the given timestamp is within the specified range
-        return timestamp >= targetTimestamp;
-    }
-
-
 }

@@ -23,10 +23,6 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Resident res = TownyAPI.getInstance().getResident((Player) commandSender);
-        commandSender.sendMessage("DEBUG: length = " + strings.length);
-        commandSender.sendMessage("DEBUG: arg0 = " + strings[0]);
-        //commandSender.sendMessage("DEBUG: arg1 = " + strings[1]);
-        commandSender.sendMessage("DEBUG: s???? = " + s);
         assert res != null;
         if (res.hasPermissionNode("townypay.command.resident.savings")) {
 
@@ -36,12 +32,10 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
             switch (arg) {
                 case "info":
                     sendSavingsInfo(commandSender, res);
-                    commandSender.sendMessage("DEBUG: info section");
                     break;
                 case "deposit":
                     if (!GeneralUtil.isNotInteger(strings[1])) {
                         amount = Integer.parseInt(strings[1]);
-                        commandSender.sendMessage("DEBUG: deposit section");
                         savingsDeposit(commandSender, res, amount);
                     } else {
                         MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
@@ -50,7 +44,6 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
                 case "withdraw":
                     if (!GeneralUtil.isNotInteger(strings[1])) {
                         amount = Integer.parseInt(strings[1]);
-                        commandSender.sendMessage("DEBUG: withdraw section");
                         savingsWithdraw(commandSender, res, amount);
                     } else {
                         MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
@@ -89,6 +82,7 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
         } else {
             int newHoldings = currentHoldings + amount;
             SavingsMetaDataController.setHoldingsData(resident,newHoldings);
+            resident.getAccount().withdraw(amount, String.valueOf(Translatable.of("townypay.Savings.Deposit")));
             MessageUtil.sendMsg(sender, Translatable.of("townypay.Resident.Savings.Deposit", amount, newHoldings));
         }
     }
@@ -103,7 +97,8 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
             int newSavings = currentSavings - amount;
 
             SavingsMetaDataController.setSavingsData(resident,newSavings);
-            resident.getAccount().withdraw(amount, String.valueOf(Translatable.of("townypay.Resident.Savings.Withdraw")));
+            resident.getAccount().deposit(amount, String.valueOf(Translatable.of("townypay.Savings.Withdraw")));
+            MessageUtil.sendMsg(sender, Translatable.of("townypay.Resident.Savings.Withdraw", amount, newSavings));
         }
     }
 

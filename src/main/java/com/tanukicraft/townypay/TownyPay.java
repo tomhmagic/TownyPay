@@ -2,34 +2,35 @@ package com.tanukicraft.townypay;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI;
-import com.palmergames.bukkit.towny.exceptions.KeyAlreadyRegisteredException;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.exceptions.initialization.TownyInitException;
-import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.TranslationLoader;
-import com.palmergames.bukkit.towny.object.metadata.BooleanDataField;
-import com.palmergames.bukkit.towny.object.metadata.IntegerDataField;
 import com.palmergames.bukkit.util.Colors;
 import com.palmergames.bukkit.util.Version;
 import com.tanukicraft.townypay.commands.*;
+import com.tanukicraft.townypay.listeners.PlayerJoinEventListener;
 import com.tanukicraft.townypay.listeners.TownyNewDayEventListener;
 import com.tanukicraft.townypay.settings.NationSettings;
 import com.tanukicraft.townypay.settings.TownSettings;
+import com.tanukicraft.townypay.metadata.MetaDataInit;
+import com.tanukicraft.townypay.util.CustomConfig;
 import org.bukkit.*;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 
 public final class TownyPay extends JavaPlugin {
 
-    private File customConfigFile;
-    private FileConfiguration customConfig;
-    private static Version requiredTownyVersion = Version.fromString("0.99.5.0");
+    private static final Version requiredTownyVersion = Version.fromString("0.99.5.0");
     private static TownyPay plugin;
 
 
@@ -41,10 +42,11 @@ public final class TownyPay extends JavaPlugin {
     }
 
 
+
     // Called when the plugin first loads.
     @Override
     public void onLoad() {
-        loadCustomDataField();
+        MetaDataInit.loadCustomDataField();
     }
     @Override
     public void onEnable() {
@@ -66,8 +68,9 @@ public final class TownyPay extends JavaPlugin {
             printArt();
             townyVersionCheck();
             loadConfig();
+            createCustomConfig();
             //Load languages
-            loadLocalization(false);
+            loadLocalization();
 
             //Load commands and listeners
             registerCommands();
@@ -91,7 +94,7 @@ public final class TownyPay extends JavaPlugin {
         if(!f.exists())
             f.mkdir();
     }
-    private void loadLocalization(boolean reload) throws TownyException {
+    private void loadLocalization() throws TownyException {
         try {
             Plugin plugin = getPlugin();
             Path langFolderPath = Paths.get(plugin.getDataFolder().getPath()).resolve("lang");
@@ -100,9 +103,6 @@ public final class TownyPay extends JavaPlugin {
             TownyAPI.getInstance().addTranslations(plugin, loader.getTranslations());
         } catch (TownyInitException e) {
             throw new TownyException("Locale files failed to load! Disabling!");
-        }
-        if (reload) {
-            info(Translatable.of("msg_reloaded_lang").defaultLocale());
         }
     }
     private void printArt() {
@@ -118,6 +118,7 @@ public final class TownyPay extends JavaPlugin {
     private void registerListeners() {
         PluginManager pm = Bukkit.getServer().getPluginManager();
         pm.registerEvents(new TownyNewDayEventListener(), this);
+        pm.registerEvents(new PlayerJoinEventListener(), this);
     }
 
     private void registerCommands() {
@@ -147,9 +148,14 @@ public final class TownyPay extends JavaPlugin {
         createPluginFolder();
         this.saveDefaultConfig();
     }
+    private void createCustomConfig() {
+        CustomConfig.setup("MessageCache", "yml");
+        CustomConfig.get().options().copyDefaults(true);
+        CustomConfig.save();
+    }
 
     private String getTownyVersion() {
-        return Bukkit.getPluginManager().getPlugin("Towny").getDescription().getVersion();
+        return Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Towny")).getDescription().getVersion();
     }
     private void townyVersionCheck() throws TownyException{
         if (!(Version.fromString(getTownyVersion()).compareTo(requiredTownyVersion) >= 0))
@@ -163,51 +169,6 @@ public final class TownyPay extends JavaPlugin {
     }
 
 
-    // Parts of a datafield
 
-    // Use those parts to create a new data field to store an integer
-    private static IntegerDataField TownyPayBudgetField = new IntegerDataField("TownyPayBudget", 0, "Budget");
-    private static IntegerDataField TownyPaySpendField = new IntegerDataField("TownyPaySpend", 0, "Spend");
-    private static IntegerDataField TownyPaySetPayField = new IntegerDataField("TownyPaySetPay", 0, "Pay");
-    private static BooleanDataField TownyPayToggleField = new BooleanDataField("TownyPayToggle", true, "Pay Toggle");
-    private static IntegerDataField TownyPaySavingsField = new IntegerDataField("TownyPaySavings", 0, "Savings");
-    private static IntegerDataField TownyPayHoldingsField = new IntegerDataField("TownyPayHoldings", 0, "Holdings");
-
-    private void loadCustomDataField(){
-        // (Optional) Try to globally register the data field.
-        // Globally registering data fields allow them to be modified in-game by administrators.
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPayBudgetField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPaySpendField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPaySetPayField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPayToggleField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPaySavingsField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-        try {
-            TownyAPI.getInstance().registerCustomDataField(TownyPayHoldingsField);
-        } catch (KeyAlreadyRegisteredException e) {
-            getLogger().warning(e.getMessage()); // A flag with the same key name already exists try again
-        }
-
-        getLogger().info("Custom data fields successfully registered!");
-    }
 
 }

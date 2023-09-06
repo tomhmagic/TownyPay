@@ -28,7 +28,7 @@ public class PayFunctions {
         MessageUtil.logStatus(Translatable.of("townypay.status.log.mayorpay.start"));
 
         for (Town town : towns) {
-            Boolean enabled = true;
+            boolean enabled = true;
 
             if (MayorPayMetaDataController.hasToggleData(town)) {
                 enabled = MayorPayMetaDataController.getToggleData(town);
@@ -41,7 +41,8 @@ public class PayFunctions {
                 double bal = town.getAccount().getHoldingBalance();
                 double profit = GeneralUtil.calcProfit(bal, upkeep, townProfitCalc);
                 if (TownSettings.canSetPay()) {
-                    if (!MayorPayMetaDataController.hasPayData(town)) {
+                    String stringCheck = String.valueOf(MayorPayMetaDataController.getPayData(town));
+                    if (!MayorPayMetaDataController.hasPayData(town) || !GeneralUtil.isNotInteger(stringCheck)) {
                         MayorPayMetaDataController.setPayData(town, TownSettings.getPayValue());
                     }
                     mayorPay = MayorPayMetaDataController.getPayData(town);
@@ -65,6 +66,9 @@ public class PayFunctions {
                         town.getAccount().payTo(payFloor, player, String.valueOf(Translatable.of("townypay.town.PayReason")));
                         assert player != null;
                         player.withdraw(taxFloor, String.valueOf(Translatable.of("townypay.town.PayTaxReason")));
+
+                        //Message Mayor
+                        MessageUtil.sendResidentMsg(town.getMayor(),Translatable.of("townypay.town.PayMsg", payFloor, taxFloor));
 
                         MessageUtil.logStatus(Translatable.of("townypay.status.log.mayorpay", town, payFloor, player.getName(), taxFloor));
                     } else {
@@ -91,7 +95,7 @@ public class PayFunctions {
         MessageUtil.logStatus(Translatable.of("townypay.status.log.kingpay.start"));
 
         for (Nation nation : nations) {
-            Boolean enabled = true;
+            boolean enabled = true;
 
             if (KingPayMetaDataController.hasToggleData(nation)) {
                 enabled = KingPayMetaDataController.getToggleData(nation);
@@ -103,7 +107,8 @@ public class PayFunctions {
             double profit = GeneralUtil.calcProfit(bal, upkeep, nationProfitCalc);
             if (enabled) {
                 if (TownSettings.canSetPay()) {
-                    if (!KingPayMetaDataController.hasPayData(nation)) {
+                    String stringCheck = String.valueOf(KingPayMetaDataController.getPayData(nation));
+                    if (!KingPayMetaDataController.hasPayData(nation) || !GeneralUtil.isNotInteger(stringCheck)) {
                         KingPayMetaDataController.setPayData(nation, TownSettings.getPayValue());
                     }
                     kingPay = KingPayMetaDataController.getPayData(nation);
@@ -128,6 +133,9 @@ public class PayFunctions {
                         nation.getAccount().payTo(payFloor, player, String.valueOf(Translatable.of("townypay.nation.PayReason")));
                         assert player != null;
                         player.withdraw(taxFloor, String.valueOf(Translatable.of("townypay.nation.PayTaxReason")));
+
+                        //Message Mayor
+                        MessageUtil.sendResidentMsg(nation.getKing(),Translatable.of("townypay.nation.PayMsg", payFloor, taxFloor));
 
                         MessageUtil.logStatus(Translatable.of("townypay.status.log.kingpay", nation, payFloor, player.getName(), taxFloor));
                     } else {
