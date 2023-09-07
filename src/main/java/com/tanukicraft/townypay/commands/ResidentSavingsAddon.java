@@ -26,31 +26,35 @@ public class ResidentSavingsAddon extends BaseCommand implements CommandExecutor
         assert res != null;
         if (res.hasPermissionNode("townypay.command.resident.savings")) {
 
-            String arg = strings[0];
-            int amount;
 
-            switch (arg) {
-                case "info":
-                    sendSavingsInfo(commandSender, res);
-                    break;
-                case "deposit":
-                    if (!GeneralUtil.isNotInteger(strings[1])) {
-                        amount = Integer.parseInt(strings[1]);
-                        savingsDeposit(commandSender, res, amount);
-                    } else {
-                        MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
-                    }
-                    break;
-                case "withdraw":
-                    if (!GeneralUtil.isNotInteger(strings[1])) {
-                        amount = Integer.parseInt(strings[1]);
-                        savingsWithdraw(commandSender, res, amount);
-                    } else {
-                        MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
-                    }
-                    break;
-                default:
-                    MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.resident.CommandFail.savings"));
+            int amount;
+            if (strings.length !=0) {
+                String arg = strings[0];
+                switch (arg) {
+                    case "info":
+                        sendSavingsInfo(commandSender, res);
+                        break;
+                    case "deposit":
+                        if (!GeneralUtil.isNotInteger(strings[1])) {
+                            amount = Integer.parseInt(strings[1]);
+                            savingsDeposit(commandSender, res, amount);
+                        } else {
+                            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
+                        }
+                        break;
+                    case "withdraw":
+                        if (!GeneralUtil.isNotInteger(strings[1])) {
+                            amount = Integer.parseInt(strings[1]);
+                            savingsWithdraw(commandSender, res, amount);
+                        } else {
+                            MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.general.ValueError"));
+                        }
+                        break;
+                    default:
+                        MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.resident.CommandFail.savings"));
+                }
+            } else {
+                MessageUtil.sendErrorMsg(commandSender, Translatable.of("townypay.resident.CommandFail.savings"));
             }
         }else{
             //no perms

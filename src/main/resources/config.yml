@@ -12,7 +12,7 @@ TownSettings:
   #Profit setting for towns, profit is worked out as
   #(Current balance - (ProfitCalc * upkeep))
   Profit:
-    Multiplier: 2.0
+    Multiplier: 5.0
 
   MayorPay:
     #Enable Mayor Pay, Disable if you just want the budget system
@@ -25,23 +25,23 @@ TownSettings:
     PayFixedAmount: false
     #Value is percentage of profit paid to mayor or fixed amount if PayFixedAmount=true, Min and Max only needed if CanSet=true
     Pay:
-      Value: 20
+      Value: 10
       Min: 5
       Max: 30
     #Percentage of tax to take from the pay, if FixedAmount=true then tax is fixed amount and cannot be higher than Pay.Value
     Tax: 20.0
     #Minimum balance before the system will pay a Mayor, if using FixedAmount, set this no less than Pay.Value
     #if FixedAmount is false, then it will use the profit to calculate Mayors pay
-    MinimumBal: 0.0
+    MinimumBal: 100.0
 
   BudgetSettings:
     #If true, Budget would be a fixed amount
     FixedBudget: false
     #Percentage of profit, fixed amount if FixedBudget=true
-    Budget: 10.0
+    Budget: 25.0
     #If FixedBudget false, set an amount for a minimum balance for the percentage calculations to return a budget.
     #Must be higher than 0.0
-    MinimumBal: 1.0
+    MinimumBal: 100.0
 
     #Tax percentage to be taken from the payee
     Tax:
@@ -73,23 +73,23 @@ NationSettings:
     PayFixedAmount: false
     #Value is percentage of profit paid to king or fixed amount if PayFixedAmount=true, Min and Max only needed if CanSet=true
     Pay:
-      Value: 20
+      Value: 10
       Min: 5
       Max: 30
     #Percentage of tax to take from the pay, if FixedAmount=true then tax is fixed amount and cannot be higher than Pay.Value
     Tax: 20.0
     #Minimum balance before the system will pay a King, if using FixedAmount, set this no less than Pay.Value
     #if FixedAmount is false, then it will use the profit to calculate Kings pay
-    MinimumBal: 0.0
+    MinimumBal: 100.0
 
   BudgetSettings:
     #If true, Budget would be a fixed amount
     FixedBudget: false
     #Percentage of profit, fixed amount if FixedBudget=true
-    Budget: 10.0
+    Budget: 25.0
     #If FixedBudget false, set an amount for a minimum balance for the percentage calculations to return a budget.
     #Must be higher than 0.0
-    MinimumBal: 1.0
+    MinimumBal: 100.0
 
     #Tax percentage to be taken from the payee
     Tax:
@@ -148,7 +148,7 @@ SavingsSettings:
       Maximum: 500000
     #Percent interest rates for each threshold, if town does not meet threshold then BaseInterest will be used
     Rates:
-      Minimal: 0.5
+      Minimal: 0.6
       Low: 0.75
       Moderate: 1.0
       High: 1.5
